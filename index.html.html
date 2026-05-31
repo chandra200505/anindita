@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Vania Final</title>
+<style>
+body{margin:0;font-family:Arial,sans-serif;background:linear-gradient(135deg,#f7c8da,#e7a8c3);min-height:100vh}
+.wrap{max-width:650px;margin:20px auto;padding:15px}
+.card{background:#fff;border-radius:28px;padding:20px;box-shadow:0 10px 35px rgba(0,0,0,.15)}
+.avatar{width:120px;height:120px;border-radius:50%;object-fit:cover;border:4px solid #e91e63;display:block;margin:auto}
+.upload{border:2px dashed #f48fb1;padding:15px;border-radius:18px;text-align:center;margin:15px 0}
+input,textarea,button{box-sizing:border-box}
+input[type=password],textarea{width:100%;padding:12px;border-radius:12px;border:1px solid #ddd}
+.btn{width:100%;padding:12px;border:none;border-radius:12px;background:#e91e63;color:#fff;cursor:pointer}
+.hidden{display:none}
+.nav{display:flex;gap:8px;margin-bottom:15px}
+.nav button{flex:1;padding:12px;border:none;border-radius:12px;cursor:pointer}
+.activeTab{background:#e91e63;color:#fff}
+.normalTab{background:#f5e4eb;color:#c2185b}
+.chips{display:flex;gap:8px;flex-wrap:wrap;margin:10px 0}
+.chips button{padding:8px 14px;border-radius:20px;border:1px solid pink;background:white;cursor:pointer}
+.activeChip{background:#e91e63!important;color:white}
+.quote{padding:20px 0;font-size:20px;font-style:italic;color:#a32b63;line-height:1.6}
+.controls{display:flex;gap:8px}
+.controls button{flex:1;padding:10px}
+.banner{margin-top:15px;height:260px;border-radius:20px;overflow:hidden;position:relative;background:#f5bfd2}
+.banner img{width:100%;height:100%;object-fit:cover}
+.overlay{position:absolute;bottom:0;left:0;right:0;background:rgba(0,0,0,.4);color:white;padding:15px;text-align:center}
+video{width:100%;border-radius:15px;background:black}
+</style>
+</head>
+<body>
+
+<div class="wrap">
+<div id="loginPage" class="card">
+<img id="avatar" class="avatar" src="https://via.placeholder.com/120?text=Foto">
+<div class="upload">
+<input type="file" id="foto" accept="image/*">
+<div>📷 Upload foto wajib sebelum login</div>
+</div>
+<input type="password" id="pass" placeholder="Password: vania">
+<br><br>
+<button class="btn" onclick="login()">Masuk</button>
+<p id="err" style="color:red"></p>
+</div>
+
+<div id="appPage" class="card hidden">
+<div class="nav">
+<button id="tabQuotes" class="activeTab" onclick="showTab('quotes')">💬 Quotes</button>
+<button id="tabCamera" class="normalTab" onclick="showTab('camera')">📷 Kamera</button>
+<button id="tabPesan" class="normalTab" onclick="showTab('pesan')">💌 Pesan</button>
+</div>
+
+<div id="quotes">
+<div class="chips">
+<button class="activeChip" onclick="setCat('Friendly',this)">Friendly</button>
+<button onclick="setCat('Santai',this)">Santai</button>
+<button onclick="setCat('Motivasi',this)">Motivasi</button>
+<button onclick="setCat('Lucu',this)">Lucu</button>
+</div>
+
+<div id="quoteText" class="quote"></div>
+
+<div class="controls">
+<button onclick="prevQuote()">⬅ Sebelumnya</button>
+<button onclick="nextQuote()">✨ Quote Baru</button>
+</div>
+
+<div class="banner">
+<img id="bannerImg">
+<div class="overlay">Foto yang diupload saat login</div>
+</div>
+</div>
+
+<div id="camera" class="hidden">
+<video id="video" autoplay playsinline></video><br><br>
+<button class="btn" onclick="startCam()">Miror selfie yaa nanti kirim ke aku wkwk</button>
+</div>
+
+<div id="pesan" class="hidden">
+<textarea rows="7">Halo Vania 🌸 Semoga harimu menyenangkan dan penuh kebahagiaan.</textarea>
+</div>
+</div>
+</div>
+
+<script>
+let uploaded=false;
+let userPhoto='';
+
+foto.onchange=(e)=>{
+ let f=e.target.files[0];
+ if(!f)return;
+ uploaded=true;
+ userPhoto=URL.createObjectURL(f);
+ avatar.src=userPhoto;
+}
+
+function login(){
+ if(!uploaded){err.innerHTML='📷 Upload foto dulu';return;}
+ if(pass.value.toLowerCase()!=='vania'){err.innerHTML='❌ Password salah';return;}
+ loginPage.classList.add('hidden');
+ appPage.classList.remove('hidden');
+ bannerImg.src=userPhoto;
+ loadQuote();
+}
+
+const quotes={
+Friendly:["Halo! Semoga harimu menyenangkan 😊","Kamu keren dan menyenangkan diajak ngobrol 🌸","Terima kasih sudah jadi teman baik ✨"],
+Santai:["Jalani hari pelan-pelan ☕","Santai aja, semua ada waktunya 😎","Nikmati prosesnya 🌈"],
+Motivasi:["Langkah kecil tetap kemajuan 🚀","Jangan menyerah 💪","Versi terbaik dirimu sedang dibangun ⭐"],
+Lucu:["Dompet tipis mimpi tebal 😂","Besok gagal dengan pengalaman 😆","Lari dari kenyataan 🤣"]
+};
+
+let kategori='Friendly';
+let idx=0;
+
+function setCat(k,el){
+ kategori=k; idx=0;
+ document.querySelectorAll('.chips button').forEach(x=>x.classList.remove('activeChip'));
+ el.classList.add('activeChip');
+ loadQuote();
+}
+
+function loadQuote(){
+ quoteText.innerText=quotes[kategori][idx];
+}
+function nextQuote(){
+ idx=(idx+1)%quotes[kategori].length;
+ loadQuote();
+}
+function prevQuote(){
+ idx=(idx-1+quotes[kategori].length)%quotes[kategori].length;
+ loadQuote();
+}
+
+function showTab(tab){
+ ['quotes','camera','pesan'].forEach(x=>document.getElementById(x).classList.add('hidden'));
+ document.getElementById(tab).classList.remove('hidden');
+
+ tabQuotes.className='normalTab';
+ tabCamera.className='normalTab';
+ tabPesan.className='normalTab';
+
+ if(tab==='quotes') tabQuotes.className='activeTab';
+ if(tab==='camera') tabCamera.className='activeTab';
+ if(tab==='pesan') tabPesan.className='activeTab';
+}
+
+async function startCam(){
+ try{
+  const stream=await navigator.mediaDevices.getUserMedia({video:true});
+  video.srcObject=stream;
+ }catch(e){alert('Kamera tidak tersedia');}
+}
+</script>
+</body>
+</html>
