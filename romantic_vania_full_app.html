@@ -1,0 +1,512 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;1,400&family=Lato:wght@300;400&display=swap');
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Lato',sans-serif;background:linear-gradient(135deg,#fff0f5 0%,#fce4ec 30%,#fff8fa 60%,#fde8f0 100%);min-height:100vh;overflow-x:hidden}
+.hearts-bg{position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:0;overflow:hidden}
+.heart-float{position:absolute;animation:floatUp 8s infinite ease-in;opacity:0}
+@keyframes floatUp{0%{transform:translateY(100vh) rotate(0deg);opacity:0}10%{opacity:0.4}90%{opacity:0.2}100%{transform:translateY(-100px) rotate(360deg);opacity:0}}
+
+/* ===== LOGIN PAGE ===== */
+#loginPage{position:relative;z-index:1;min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:20px}
+.login-card{background:rgba(255,255,255,0.92);border-radius:28px;padding:36px 28px;max-width:400px;width:100%;box-shadow:0 8px 40px rgba(233,30,140,0.18);border:1px solid rgba(244,143,177,0.3);text-align:center}
+.login-avatar{width:120px;height:120px;border-radius:50%;object-fit:cover;border:4px solid #e91e8c;box-shadow:0 4px 20px rgba(233,30,140,0.35);margin:0 auto 16px;display:block}
+.login-name{font-family:'Playfair Display',serif;font-size:22px;color:#c2185b;font-style:italic;margin-bottom:4px}
+.login-sub{font-size:12px;color:#e07ca0;letter-spacing:1.5px;text-transform:uppercase;margin-bottom:24px}
+.input-wrap{position:relative;margin-bottom:14px}
+.input-wrap input{width:100%;padding:12px 16px 12px 42px;border-radius:50px;border:1.5px solid rgba(233,30,140,0.25);background:rgba(255,255,255,0.9);font-family:'Lato',sans-serif;font-size:14px;color:#880e4f;outline:none;transition:all 0.25s}
+.input-wrap input:focus{border-color:#e91e8c;box-shadow:0 0 0 3px rgba(233,30,140,0.1)}
+.input-wrap input::placeholder{color:#e07ca0}
+.input-icon{position:absolute;left:14px;top:50%;transform:translateY(-50%);color:#e07ca0;font-size:16px}
+.btn-login{width:100%;padding:13px;border-radius:50px;border:none;background:linear-gradient(135deg,#e91e8c,#f06292);color:white;font-family:'Lato',sans-serif;font-size:14px;cursor:pointer;box-shadow:0 4px 16px rgba(233,30,140,0.35);transition:all 0.25s;margin-top:8px}
+.btn-login:hover{transform:translateY(-2px);box-shadow:0 6px 22px rgba(233,30,140,0.45)}
+.upload-zone{border:2px dashed rgba(233,30,140,0.35);border-radius:16px;padding:16px;margin-bottom:16px;cursor:pointer;transition:all 0.25s;position:relative}
+.upload-zone:hover{border-color:#e91e8c;background:rgba(233,30,140,0.05)}
+.upload-zone input{position:absolute;inset:0;opacity:0;cursor:pointer}
+.upload-text{font-size:13px;color:#e07ca0;margin-top:6px}
+.upload-preview{width:64px;height:64px;border-radius:50%;object-fit:cover;border:2px solid #e91e8c;margin:0 auto;display:block}
+.login-divider{display:flex;align-items:center;gap:10px;margin:16px 0}
+.login-divider-line{flex:1;height:1px;background:rgba(233,30,140,0.2)}
+.login-divider span{font-size:11px;color:#e07ca0;letter-spacing:1px;text-transform:uppercase}
+.err-msg{color:#c62828;font-size:12px;margin-top:8px;display:none}
+
+/* ===== MAIN APP ===== */
+#mainApp{display:none;position:relative;z-index:1}
+.app-container{max-width:480px;margin:0 auto;padding:20px 16px 40px}
+.header{text-align:center;padding:24px 0 20px}
+.header-avatar{width:72px;height:72px;border-radius:50%;object-fit:cover;border:3px solid #e91e8c;box-shadow:0 3px 14px rgba(233,30,140,0.3);margin:0 auto 10px;display:block}
+.header h1{font-family:'Playfair Display',serif;font-size:24px;font-weight:600;color:#c2185b;letter-spacing:0.5px}
+.header h1 span{font-style:italic;color:#e91e8c}
+.header p{font-size:12px;color:#e07ca0;margin-top:4px;font-weight:300;letter-spacing:1.5px;text-transform:uppercase}
+.divider{display:flex;align-items:center;gap:10px;margin:0 20px 20px}
+.divider-line{flex:1;height:1px;background:linear-gradient(to right,transparent,#f48fb1,transparent)}
+.nav-tabs{display:flex;gap:8px;margin-bottom:20px;background:rgba(255,255,255,0.7);border-radius:50px;padding:5px;box-shadow:0 2px 14px rgba(233,30,140,0.1)}
+.nav-tab{flex:1;padding:10px 8px;border:none;border-radius:50px;cursor:pointer;font-family:'Lato',sans-serif;font-size:13px;transition:all 0.3s;background:transparent;color:#e07ca0}
+.nav-tab.active{background:linear-gradient(135deg,#e91e8c,#f06292);color:white;box-shadow:0 4px 14px rgba(233,30,140,0.35)}
+.section{display:none;animation:fadeIn 0.4s ease}
+.section.active{display:block}
+@keyframes fadeIn{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+.card{background:rgba(255,255,255,0.85);border-radius:20px;padding:24px;box-shadow:0 4px 24px rgba(233,30,140,0.1);border:1px solid rgba(244,143,177,0.25);margin-bottom:16px}
+.quote-card{position:relative;overflow:hidden;background:linear-gradient(135deg,rgba(255,255,255,0.95),rgba(252,228,236,0.8))}
+.quote-dec{position:absolute;top:12px;left:16px;font-family:'Playfair Display',serif;font-size:72px;color:rgba(233,30,140,0.1);line-height:1}
+.quote-text{font-family:'Playfair Display',serif;font-size:17px;line-height:1.75;color:#880e4f;font-style:italic;position:relative;z-index:1;padding:8px 0 14px}
+.quote-author{font-size:12px;color:#e07ca0;letter-spacing:1.5px;text-transform:uppercase;text-align:right}
+.quote-btn-row{display:flex;gap:10px;margin-top:16px}
+.btn-q{flex:1;padding:11px;border-radius:50px;border:none;cursor:pointer;font-family:'Lato',sans-serif;font-size:13px;transition:all 0.25s}
+.btn-primary{background:linear-gradient(135deg,#e91e8c,#f06292);color:white;box-shadow:0 3px 12px rgba(233,30,140,0.3)}
+.btn-primary:hover{transform:translateY(-1px)}
+.btn-secondary{background:rgba(233,30,140,0.08);color:#c2185b;border:1px solid rgba(233,30,140,0.2)}
+.cat-row{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px}
+.cat-chip{padding:6px 14px;border-radius:50px;border:1.5px solid rgba(233,30,140,0.25);cursor:pointer;font-size:12px;color:#c2185b;background:rgba(255,255,255,0.8);transition:all 0.2s;font-family:'Lato',sans-serif}
+.cat-chip.active{background:linear-gradient(135deg,#e91e8c,#f06292);color:white;border-color:transparent;box-shadow:0 2px 10px rgba(233,30,140,0.3)}
+
+/* camera */
+.cam-container{border-radius:16px;overflow:hidden;position:relative;background:#fce4ec;margin-bottom:14px;aspect-ratio:4/3;display:flex;align-items:center;justify-content:center;box-shadow:inset 0 0 20px rgba(233,30,140,0.1)}
+#cameraFeed,#photoCanvas{width:100%;height:100%;object-fit:cover;position:absolute;top:0;left:0}
+#photoCanvas{display:none}
+.cam-placeholder{text-align:center;color:#e07ca0}
+.cam-placeholder .ci{font-size:48px;margin-bottom:8px}
+.cam-placeholder p{font-size:14px;font-weight:300}
+.cam-overlay{position:absolute;inset:0;pointer-events:none;border:2px solid rgba(233,30,140,0.3);border-radius:16px}
+.corner{position:absolute;width:24px;height:24px}
+.corner.tl{top:8px;left:8px;border-top:2px solid #e91e8c;border-left:2px solid #e91e8c;border-radius:4px 0 0 0}
+.corner.tr{top:8px;right:8px;border-top:2px solid #e91e8c;border-right:2px solid #e91e8c;border-radius:0 4px 0 0}
+.corner.bl{bottom:8px;left:8px;border-bottom:2px solid #e91e8c;border-left:2px solid #e91e8c;border-radius:0 0 0 4px}
+.corner.br{bottom:8px;right:8px;border-bottom:2px solid #e91e8c;border-right:2px solid #e91e8c;border-radius:0 0 4px 0}
+.filter-row{display:flex;gap:8px;overflow-x:auto;padding-bottom:4px;margin-bottom:14px}
+.filter-row::-webkit-scrollbar{height:3px}
+.filter-row::-webkit-scrollbar-thumb{background:rgba(233,30,140,0.3);border-radius:10px}
+.filter-btn{flex-shrink:0;padding:7px 14px;border-radius:50px;border:1.5px solid rgba(233,30,140,0.2);cursor:pointer;font-size:12px;color:#c2185b;background:rgba(255,255,255,0.8);font-family:'Lato',sans-serif;transition:all 0.2s;white-space:nowrap}
+.filter-btn.active{background:#e91e8c;color:white;border-color:transparent}
+.cam-btn-row{display:flex;gap:10px;justify-content:center;margin-top:4px}
+.btn-cam{padding:12px 24px;border-radius:50px;border:none;cursor:pointer;font-family:'Lato',sans-serif;font-size:13px;transition:all 0.25s}
+.btn-cam-main{background:linear-gradient(135deg,#e91e8c,#f06292);color:white;padding:14px 32px;box-shadow:0 4px 16px rgba(233,30,140,0.35)}
+.btn-cam-main:hover{transform:translateY(-2px)}
+.btn-cam-sec{background:rgba(255,255,255,0.9);color:#c2185b;border:1.5px solid rgba(233,30,140,0.25)}
+
+/* photo frame - foto Vania tampil di sini */
+.vania-photo-frame{border-radius:20px;overflow:hidden;margin-bottom:16px;position:relative;box-shadow:0 6px 28px rgba(233,30,140,0.22)}
+.vania-photo-frame img{width:100%;display:block}
+.vania-photo-overlay{position:absolute;bottom:0;left:0;right:0;background:linear-gradient(to top,rgba(194,24,91,0.9),transparent);color:white;padding:24px 16px 14px;text-align:center}
+.vania-photo-overlay .vname{font-family:'Playfair Display',serif;font-size:20px;font-style:italic}
+.vania-photo-overlay .vsub{font-size:11px;letter-spacing:2px;text-transform:uppercase;opacity:0.85;margin-top:2px}
+
+/* message section */
+.msg-area{background:rgba(252,228,236,0.4);border-radius:14px;padding:20px;margin-bottom:16px;border:1px solid rgba(244,143,177,0.3)}
+.msg-label{font-size:11px;color:#e07ca0;letter-spacing:1.5px;text-transform:uppercase;margin-bottom:10px;display:flex;align-items:center;gap:8px}
+.msg-label::before,.msg-label::after{content:'';flex:1;height:1px;background:rgba(233,30,140,0.2)}
+.msg-display{font-family:'Playfair Display',serif;font-size:15px;line-height:1.8;color:#880e4f;font-style:italic;text-align:center;padding:8px 0;min-height:56px;display:flex;align-items:center;justify-content:center}
+.pulse-heart{text-align:center;margin:16px 0;animation:pulse 1.5s ease-in-out infinite;font-size:44px;line-height:1}
+@keyframes pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.15)}}
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(80px);background:linear-gradient(135deg,#e91e8c,#f06292);color:white;padding:12px 24px;border-radius:50px;font-size:13px;font-family:'Lato',sans-serif;box-shadow:0 4px 20px rgba(233,30,140,0.4);transition:transform 0.35s cubic-bezier(0.34,1.56,0.64,1);z-index:999;white-space:nowrap}
+.toast.show{transform:translateX(-50%) translateY(0)}
+.photo-preview-wrap{display:none;margin-top:12px;border-radius:16px;overflow:hidden;position:relative}
+.photo-preview-wrap img{width:100%;border-radius:16px;box-shadow:0 4px 20px rgba(233,30,140,0.2)}
+.photo-caption-overlay{position:absolute;bottom:0;left:0;right:0;background:linear-gradient(to top,rgba(194,24,91,0.85),transparent);color:white;padding:20px 16px 12px;font-family:'Playfair Display',serif;font-size:14px;font-style:italic}
+</style>
+</head>
+<body>
+<div class="hearts-bg" id="heartsBg"></div>
+
+<!-- ===== LOGIN PAGE ===== -->
+<div id="loginPage">
+  <div class="login-card">
+    <div id="avatarWrap">
+      <img id="loginAvatar" class="login-avatar" src="data:image/jpeg;base64,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" alt="Vania"/>
+    </div>
+    <div class="login-name">Vania Anindita</div>
+    <div class="login-sub">masukkan kata sandi cintamu 💕</div>
+
+    <div class="upload-zone" id="uploadZone">
+      <input type="file" id="photoUpload" accept="image/*" onchange="handlePhotoUpload(event)"/>
+      <div id="uploadContent">
+        <div style="font-size:28px">📷</div>
+        <div class="upload-text">Upload foto kamu (opsional)<br><small>klik untuk pilih foto</small></div>
+      </div>
+    </div>
+
+    <div class="login-divider">
+      <div class="login-divider-line"></div>
+      <span>atau langsung masuk</span>
+      <div class="login-divider-line"></div>
+    </div>
+
+    <div class="input-wrap">
+      <span class="input-icon">💌</span>
+      <input type="text" id="usernameInput" placeholder="Nama kamu..." autocomplete="off"/>
+    </div>
+    <div class="input-wrap">
+      <span class="input-icon">🔑</span>
+      <input type="password" id="passInput" placeholder="Kata sandi cinta..." autocomplete="off"/>
+    </div>
+    <div id="errMsg" class="err-msg">❌ Kata sandi salah. Coba lagi sayang~</div>
+    <button class="btn-login" onclick="doLogin()">💕 Masuk ke Dunia Cinta</button>
+    <div style="font-size:11px;color:#e07ca0;margin-top:12px;opacity:0.7">hint: kata sandi adalah "vania" 🌸</div>
+  </div>
+</div>
+
+<!-- ===== MAIN APP ===== -->
+<div id="mainApp">
+  <div class="app-container">
+    <!-- Header with Vania's photo -->
+    <div class="header">
+      <img id="mainAvatar" class="header-avatar" src="" alt="Vania"/>
+      <h1>Untuk <span>Vania Anindita</span> 💕</h1>
+      <p>with all my love, always & forever</p>
+    </div>
+
+    <div class="divider">
+      <div class="divider-line"></div>
+      <span style="color:#e91e8c;font-size:16px">❤</span>
+      <div class="divider-line"></div>
+    </div>
+
+    <!-- Nav -->
+    <div class="nav-tabs">
+      <button class="nav-tab active" onclick="switchTab('quotes',this)">💬 Quotes</button>
+      <button class="nav-tab" onclick="switchTab('camera',this)">📷 Kamera</button>
+      <button class="nav-tab" onclick="switchTab('pesan',this)">💌 Pesan</button>
+    </div>
+
+    <!-- QUOTES -->
+    <div class="section active" id="section-quotes">
+      <div class="cat-row" id="catRow">
+        <div class="cat-chip active" onclick="setCategory('semua',this)">Semua</div>
+        <div class="cat-chip" onclick="setCategory('rindu',this)">Rindu</div>
+        <div class="cat-chip" onclick="setCategory('cinta',this)">Cinta</div>
+        <div class="cat-chip" onclick="setCategory('sayang',this)">Sayang</div>
+        <div class="cat-chip" onclick="setCategory('puisi',this)">Puisi</div>
+      </div>
+
+      <div class="card quote-card" id="quoteCard">
+        <div class="quote-dec">"</div>
+        <div class="quote-text" id="quoteText">Vania Anindita, dalam setiap detik yang berlalu, namamu selalu menjadi kata terindah yang terlintas di pikiranku.</div>
+        <div class="quote-author">— untukmu, selalu ✦</div>
+      </div>
+
+      <div class="quote-btn-row">
+        <button class="btn-q btn-secondary" onclick="prevQuote()">← Sebelumnya</button>
+        <button class="btn-q btn-primary" onclick="nextQuote()">✨ Quote Baru</button>
+      </div>
+
+      <!-- Vania photo frame in quotes section -->
+      <div class="vania-photo-frame" style="margin-top:20px">
+        <img id="vaniaPhotoQuotes" src="" alt="Vania Anindita"/>
+        <div class="vania-photo-overlay">
+          <div class="vname">Vania Anindita</div>
+          <div class="vsub">my sweet love 🌸</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- CAMERA -->
+    <div class="section" id="section-camera">
+      <div class="card" style="padding:20px">
+        <p style="font-size:12px;color:#e07ca0;letter-spacing:1px;text-transform:uppercase;margin-bottom:14px;text-align:center">Filter Frame Romantis</p>
+        <div class="filter-row">
+          <button class="filter-btn active" onclick="setFilter('none',this)">🌸 Normal</button>
+          <button class="filter-btn" onclick="setFilter('sepia(0.6) saturate(1.2)',this)">🌺 Vintage</button>
+          <button class="filter-btn" onclick="setFilter('saturate(1.5) hue-rotate(330deg)',this)">💕 Rose</button>
+          <button class="filter-btn" onclick="setFilter('contrast(0.9) brightness(1.1) saturate(0.8)',this)">🤍 Soft</button>
+          <button class="filter-btn" onclick="setFilter('saturate(0) brightness(1.1)',this)">🖤 Mono</button>
+        </div>
+
+        <div class="cam-container" id="cameraContainer">
+          <div class="cam-placeholder" id="cameraPlaceholder" style="display:flex;flex-direction:column;align-items:center;justify-content:center">
+            <div class="ci">📷</div>
+            <p>Klik tombol di bawah<br>untuk membuka kamera</p>
+          </div>
+          <video id="cameraFeed" autoplay playsinline style="display:none"></video>
+          <canvas id="photoCanvas"></canvas>
+          <div class="cam-overlay">
+            <div class="corner tl"></div><div class="corner tr"></div>
+            <div class="corner bl"></div><div class="corner br"></div>
+          </div>
+        </div>
+
+        <div class="cam-btn-row">
+          <button class="btn-cam btn-cam-sec" id="btnToggleCam" onclick="toggleCamera()">📷 Buka Kamera</button>
+          <button class="btn-cam btn-cam-main" id="btnCapture" onclick="capturePhoto()" style="display:none">📸 Ambil Foto</button>
+        </div>
+      </div>
+
+      <!-- Vania photo as camera inspiration -->
+      <div class="card" style="padding:16px;text-align:center">
+        <p style="font-size:12px;color:#e07ca0;letter-spacing:1px;text-transform:uppercase;margin-bottom:12px">Inspirasi Foto Romantis</p>
+        <img id="vaniaPhotoCamera" src="" style="width:100%;border-radius:14px;box-shadow:0 4px 18px rgba(233,30,140,0.2)" alt="Vania"/>
+        <p style="font-family:'Playfair Display',serif;font-size:14px;color:#c2185b;margin-top:10px;font-style:italic">Cantik seperti dirimu 🌸</p>
+      </div>
+
+      <div class="photo-preview-wrap" id="photoPreview">
+        <img id="capturedPhoto" src="" alt="Foto romantis"/>
+        <div class="photo-caption-overlay" id="photoCaptionText"></div>
+        <div style="padding:14px;display:flex;gap:8px">
+          <button class="btn-cam btn-cam-sec" style="flex:1" onclick="retakePhoto()">🔄 Ulangi</button>
+          <button class="btn-cam btn-cam-main" style="flex:1" onclick="savePhoto()">💾 Simpan</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- PESAN -->
+    <div class="section" id="section-pesan">
+      <!-- Vania full photo in message section -->
+      <div class="vania-photo-frame">
+        <img id="vaniaPhotoMsg" src="" alt="Vania Anindita"/>
+        <div class="vania-photo-overlay">
+          <div class="vname" style="font-size:22px">Vania Anindita</div>
+          <div class="vsub">kamu adalah alasan senyumku 🌷</div>
+        </div>
+      </div>
+
+      <div class="msg-area">
+        <div class="msg-label">Pesan Cinta Untukmu</div>
+        <div class="msg-display" id="loveMsgDisplay">Vania, kamu adalah bintang paling terang dalam hidupku. 🌟</div>
+      </div>
+
+      <div class="card" style="padding:16px">
+        <p style="font-size:12px;color:#e07ca0;text-transform:uppercase;letter-spacing:1px;margin-bottom:12px;text-align:center">Alasan aku mencintaimu</p>
+        <div id="reasonsList" style="display:flex;flex-direction:column;gap:10px"></div>
+      </div>
+
+      <div class="pulse-heart">💝</div>
+
+      <div style="display:flex;gap:10px;margin-top:4px">
+        <button class="btn-q btn-secondary" style="flex:1" onclick="prevMsg()">← Sebelumnya</button>
+        <button class="btn-q btn-primary" style="flex:1" onclick="nextMsg()">Berikutnya →</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const VANIA_IMG = "data:image/jpeg;base64,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";
+let uploadedPhotoUrl = VANIA_IMG;
+
+// Set all Vania photos
+function setVaniaPhotos(url) {
+  const imgs = ['loginAvatar','mainAvatar','vaniaPhotoQuotes','vaniaPhotoCamera','vaniaPhotoMsg'];
+  imgs.forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.src = url;
+  });
+}
+setVaniaPhotos(VANIA_IMG);
+
+// Floating hearts
+const heartsBg = document.getElementById('heartsBg');
+const hEmojis = ['💕','💖','🌸','💗','💓','🌺','💝','✨'];
+for (let i = 0; i < 14; i++) {
+  const h = document.createElement('div');
+  h.className = 'heart-float';
+  h.textContent = hEmojis[Math.floor(Math.random() * hEmojis.length)];
+  h.style.left = Math.random() * 100 + '%';
+  h.style.animationDelay = Math.random() * 8 + 's';
+  h.style.animationDuration = (6 + Math.random() * 6) + 's';
+  h.style.fontSize = (12 + Math.random() * 16) + 'px';
+  heartsBg.appendChild(h);
+}
+
+// Photo upload
+function handlePhotoUpload(e) {
+  const file = e.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = function(ev) {
+    uploadedPhotoUrl = ev.target.result;
+    const up = document.getElementById('uploadContent');
+    up.innerHTML = '<img src="' + uploadedPhotoUrl + '" class="upload-preview" alt="preview"/><div class="upload-text" style="margin-top:6px;color:#e91e8c;font-size:12px">Foto berhasil dipilih 💕</div>';
+  };
+  reader.readAsDataURL(file);
+}
+
+// Login
+function doLogin() {
+  const pass = document.getElementById('passInput').value.toLowerCase().trim();
+  const errEl = document.getElementById('errMsg');
+  if (pass === 'vania' || pass === 'love' || pass === 'sayang') {
+    setVaniaPhotos(uploadedPhotoUrl);
+    document.getElementById('loginPage').style.display = 'none';
+    document.getElementById('mainApp').style.display = 'block';
+    showToast('Selamat datang, Vania! 💕');
+  } else {
+    errEl.style.display = 'block';
+    const inp = document.getElementById('passInput');
+    inp.style.borderColor = '#e57373';
+    setTimeout(() => { inp.style.borderColor = ''; errEl.style.display = 'none'; }, 2000);
+  }
+}
+document.getElementById('passInput').addEventListener('keydown', e => { if (e.key === 'Enter') doLogin(); });
+document.getElementById('usernameInput').addEventListener('keydown', e => { if (e.key === 'Enter') document.getElementById('passInput').focus(); });
+
+// Quotes
+const allQuotes = {
+  semua: [
+    "Vania Anindita, dalam setiap detik yang berlalu, namamu selalu menjadi kata terindah yang terlintas di pikiranku.",
+    "Bersamamu, setiap hari terasa seperti halaman baru dari kisah cinta yang paling indah.",
+    "Vania, kamu bukan hanya bagian dari hidupku — kamu adalah alasan kenapa hidupku begitu berharga.",
+    "Aku rindu kamu bukan hanya ketika jauh, tapi bahkan saat kita berada dalam ruangan yang sama.",
+    "Di matamu, aku menemukan rumah yang selalu ingin aku pulang.",
+    "Kamu adalah melodiku yang paling indah dalam simfoni kehidupan ini.",
+    "Setiap aku melihat bintang, aku berdoa agar selalu bisa bersamamu, Vania.",
+    "Senyummu adalah alasan terbaik untuk aku bangun setiap pagi.",
+  ],
+  rindu: [
+    "Aku rindu kamu bukan hanya ketika jauh, tapi bahkan saat kita berada dalam ruangan yang sama.",
+    "Rinduku padamu seperti ombak yang tak pernah berhenti menyapa pantai.",
+    "Jarak itu menyakitkan, tapi setiap langkah yang kupunya hanya menuju ke arahmu, Vania.",
+    "Aku rindu cara kamu tertawa, cara kamu memandang, cara kamu ada untukku.",
+  ],
+  cinta: [
+    "Vania, kamu bukan hanya bagian dari hidupku — kamu adalah alasan kenapa hidupku begitu berharga.",
+    "Senyummu adalah alasan terbaik untuk aku bangun setiap pagi.",
+    "Mencintaimu adalah hal terbaik yang pernah aku lakukan dalam hidupku.",
+    "Cintaku padamu tidak membutuhkan alasan — ia hadir sendiri, tumbuh sendiri, dan tak pernah mau pergi.",
+  ],
+  sayang: [
+    "Bersamamu, setiap hari terasa seperti halaman baru dari kisah cinta yang paling indah.",
+    "Kamu hadir bukan hanya dalam mimpiku, tapi juga dalam setiap doaku.",
+    "Menyayangimu adalah caraku bersyukur atas semua keindahan hidup ini.",
+  ],
+  puisi: [
+    "Di matamu, aku menemukan rumah yang selalu ingin aku pulang.",
+    "Kamu adalah melodiku yang paling indah dalam simfoni kehidupan ini.",
+    "Seperti bunga yang mekar di musim semi, kehadiranmu mengubah segalanya menjadi cerah, Vania.",
+    "Dalam puisi hidupku, setiap baris yang terindah selalu bermuara pada satu nama: Vania Anindita.",
+  ]
+};
+let currentCat = 'semua', currentQuoteIdx = 0;
+function setCategory(cat, el) {
+  currentCat = cat; currentQuoteIdx = 0;
+  document.querySelectorAll('.cat-chip').forEach(c => c.classList.remove('active'));
+  el.classList.add('active');
+  showQuote();
+}
+function showQuote() {
+  const q = allQuotes[currentCat][currentQuoteIdx];
+  const el = document.getElementById('quoteText');
+  el.style.opacity = 0;
+  setTimeout(() => { el.textContent = q; el.style.opacity = 1; el.style.transition = 'opacity 0.4s'; }, 150);
+}
+function nextQuote() {
+  currentQuoteIdx = (currentQuoteIdx + 1) % allQuotes[currentCat].length;
+  showQuote(); showToast('💕 Quote baru untuk Vania!');
+}
+function prevQuote() {
+  currentQuoteIdx = (currentQuoteIdx - 1 + allQuotes[currentCat].length) % allQuotes[currentCat].length;
+  showQuote();
+}
+
+// Tab
+function switchTab(tab, el) {
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+  document.getElementById('section-' + tab).classList.add('active');
+  el.classList.add('active');
+}
+
+// Camera
+let stream = null, currentFilter = 'none', cameraOpen = false;
+function setFilter(filter, el) {
+  currentFilter = filter;
+  document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+  el.classList.add('active');
+  const feed = document.getElementById('cameraFeed');
+  feed.style.filter = filter;
+}
+async function toggleCamera() {
+  const btn = document.getElementById('btnToggleCam');
+  const captBtn = document.getElementById('btnCapture');
+  const feed = document.getElementById('cameraFeed');
+  const ph = document.getElementById('cameraPlaceholder');
+  if (!cameraOpen) {
+    try {
+      stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'user' }, audio: false });
+      feed.srcObject = stream;
+      feed.style.display = 'block';
+      feed.style.filter = currentFilter;
+      ph.style.display = 'none';
+      btn.textContent = '⛔ Tutup Kamera';
+      captBtn.style.display = 'block';
+      cameraOpen = true;
+    } catch(e) { showToast('📷 Izin kamera diperlukan'); }
+  } else {
+    if (stream) stream.getTracks().forEach(t => t.stop());
+    feed.style.display = 'none';
+    ph.style.display = 'flex';
+    btn.textContent = '📷 Buka Kamera';
+    captBtn.style.display = 'none';
+    cameraOpen = false;
+  }
+}
+const photoQuotes = ["Vania, kamu memang yang paling cantik 🌸","Senyum itu… bikin aku jatuh cinta lagi 💕","Foto ini sempurna, sama seperti kamu ✨","Cantiknya minta ampun, Vania Anindita 🌺","Ini foto tersayangku 💝"];
+function capturePhoto() {
+  const feed = document.getElementById('cameraFeed');
+  const canvas = document.getElementById('photoCanvas');
+  const ctx = canvas.getContext('2d');
+  canvas.width = feed.videoWidth;
+  canvas.height = feed.videoHeight;
+  ctx.filter = currentFilter === 'none' ? 'none' : currentFilter;
+  ctx.drawImage(feed, 0, 0);
+  const dataURL = canvas.toDataURL('image/jpeg', 0.9);
+  const prev = document.getElementById('photoPreview');
+  document.getElementById('capturedPhoto').src = dataURL;
+  document.getElementById('photoCaptionText').textContent = photoQuotes[Math.floor(Math.random() * photoQuotes.length)];
+  prev.style.display = 'block';
+  prev.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  showToast('📸 Foto berhasil diambil!');
+}
+function retakePhoto() { document.getElementById('photoPreview').style.display = 'none'; }
+function savePhoto() {
+  const img = document.getElementById('capturedPhoto');
+  const a = document.createElement('a');
+  a.href = img.src;
+  a.download = 'Vania_Anindita_' + Date.now() + '.jpg';
+  a.click();
+  showToast('💾 Foto tersimpan untuk Vania!');
+}
+
+// Messages
+const loveMsgs = [
+  "Vania, kamu adalah bintang paling terang dalam hidupku. 🌟",
+  "Setiap hari bersamamu adalah anugerah terindah. 🌷",
+  "Kamu membuat hidupku jauh lebih berwarna, Vania. 🎨",
+  "Aku bersyukur setiap hari bisa mencintaimu. 💕",
+  "Kamu adalah jawaban dari semua doaku. 🙏",
+  "Bersamamu, aku merasa menjadi versi terbaik diriku. ✨",
+];
+const reasons = [
+  "💖 Caramu tertawa yang selalu menghangatkan hatiku",
+  "🌸 Kepribadianmu yang lembut dan penuh kasih sayang",
+  "✨ Kamu selalu tahu cara membuatku tersenyum",
+  "💝 Ketulusanmu yang tidak pernah pudar",
+  "🌺 Caramu ada untukku di setiap saat",
+];
+let msgIdx = 0;
+function showMsg() {
+  const el = document.getElementById('loveMsgDisplay');
+  el.style.opacity = 0;
+  setTimeout(() => { el.textContent = loveMsgs[msgIdx]; el.style.opacity = 1; el.style.transition = 'opacity 0.4s'; }, 150);
+}
+function nextMsg() { msgIdx = (msgIdx + 1) % loveMsgs.length; showMsg(); }
+function prevMsg() { msgIdx = (msgIdx - 1 + loveMsgs.length) % loveMsgs.length; showMsg(); }
+const rl = document.getElementById('reasonsList');
+reasons.forEach(r => {
+  const d = document.createElement('div');
+  d.style.cssText = 'padding:10px 14px;background:rgba(252,228,236,0.5);border-radius:12px;font-size:13px;color:#880e4f;border:1px solid rgba(244,143,177,0.25)';
+  d.textContent = r; rl.appendChild(d);
+});
+
+// Toast
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2500);
+}
+</script>
+</body>
+</html>
